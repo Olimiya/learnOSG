@@ -1,7 +1,6 @@
-﻿//#include "mainwindow.h"
-//#include <QApplication>
+﻿//#include <QApplication>
 
-//#include "osg/osg_romaingwindow.h"
+//#include "OSGQt_Romaing/osg_romaingwindow.h"
 
 //int main(int argc, char *argv[])
 //{

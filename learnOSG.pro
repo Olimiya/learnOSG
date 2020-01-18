@@ -75,7 +75,11 @@ SOURCES += \
     OSGQt_Romaing/map_osg_viewcontroller.cpp \
     OSGQt_Romaing/osg_romaingwindow.cpp \
     OSGQt_Romaing/pickhandler.cpp \
-    OSG_Vedio/blur.cpp
+    OSG_Vedio/blur.cpp \
+    OSG_EARTH/osgearth_drawable.cpp \
+    OSG_EARTH/osgearth_annotation.cpp \
+    OSG_EARTH/osgearth_graticule.cpp \
+    OSG_EARTH/osgearth_geodetic_graticule.cpp
 
 HEADERS += \
     OSG_Book/conduit.h \
