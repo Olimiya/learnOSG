@@ -1,0 +1,16 @@
+<!--
+	learn osgEarth, test File.
+-->
+
+<map name="TMS Example" type = "Projected">
+	<options>
+        <cache type="filesystem">
+            <path>./cache</path>
+        </cache>
+	</options>
+		
+	<image name = "world" driver = "gdal">
+		<url>world.tif</url>
+	</image>
+
+</map>

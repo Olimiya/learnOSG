@@ -12,7 +12,7 @@ OSG_RomaingWindow::OSG_RomaingWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setFocus();
-    m_osgWidget = MAP_OSG_ViewController::addView("house.ive");
+    m_osgWidget = MAP_OSG_ViewController::addView("model/house.ive");
     QWidget w(this);
     setCentralWidget(m_osgWidget);
 }

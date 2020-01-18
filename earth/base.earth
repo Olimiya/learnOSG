@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<map>
+  <options name="simple_basemap" type="geocentric">
+    <terrain first_lod="1" high_resolution_first="true" skirt_ratio="0.2" tile_size="17" />
+    <cache path=".\cache_dir" type="filesystem" />
+  </options>
+  <image cacheid="Google Image" driver="xyz" enabled="true" is2d3d="map_2d_3d" name="Google Image" profile="global-mercator" url="http://khm[0123].google.com/kh/v=840&amp;hl=zh&amp;x={x}&amp;y={y}&amp;z={z}&amp;s=" visible="true">
+    <cache_policy usage="read_write" />
+  </image>
+  <image cacheid="Google Street Image" driver="xyz" enabled="true" is2d3d="map_2d_3d" name="Google Street Image" profile="global-mercator" url="http://mt[0123].google.cn/vt/imgtp=png32&amp;lyrs=h@292000000&amp;hl=zh-CN&amp;gl=cn&amp;x={x}&amp;y={y}&amp;z={z}&amp;s=" visible="true">
+    <cache_policy usage="read_write" />
+  </image>
+  <elevation cacheid="Mapbox Dem" driver="xyz" elevation_encoding="mapbox" enabled="true" is2d3d="map_3d" max_level="12" name="Mapbox DEM" url="http://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA" visible="true">
+    <profile srs="spherical-mercator" />
+    <cache_policy usage="read_write" />
+  </elevation>
+  <extensions>
+    <sky driver="simple" />
+  </extensions>
+</map>
