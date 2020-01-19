@@ -1,28 +1,46 @@
-﻿//#include <osgDB/ReadFile>
-//#include <osgViewer/Viewer>
-//#include <osgDB/Registry>
-//#include <osg/DrawPixels>
+﻿//#include <osgViewer/Viewer>
+//#include <osgDB/ReadFile>
+//#include <osg/Geode>
+//#include <osg/Geometry>
+//#include <osg/StateSet>
+//#include <osg/StateAttribute>
+//#include <osg/Texture2D>
+//#include <osg/BlendFunc>
+//#include <osg/AlphaFunc>
+//#include <osg/Notify>
 
-
-////USE_OSGPLUGIN(png)
-////#pragma comment( lib,"osgdb_pngd.lib" )
+//#include <osgViewer/ViewerEventHandlers>
+//#include <osgGA/StateSetManipulator>
+//#include <QDebug>
 
 
 //int main()
 //{
-//    //osgDB::Registry::instance()->loadLibrary("osgdb_pngd.dll");
-//    osg::ref_ptr<osg::Group> root = new osg::Group;
-//    osg::ref_ptr<osg::Image> image = osgDB::readImageFile("model/blueFlowers.png");
-//    osg::ref_ptr<osg::DrawPixels> bitmap_in = new osg::DrawPixels;
-//    bitmap_in->setPosition(osg::Vec3d(16445.0f,25430.0f,50.0f));
-//    bitmap_in->setImage(image);
+//    auto b = osgDB::Registry::instance()->loadLibrary("osgdb_svg");
+//    qDebug() << b;
+//    auto c = osgDB::Registry::instance()->loadLibrary("osgdb_svgd");
+//    qDebug() << c;
+//    auto l=osgDB::Registry::instance()->getReaderWriterForExtension("svg");
+//    if(l)
+//    {
+//        qDebug() << l->className();
+//    }
 
-//    osg::ref_ptr<osg::Geode>geode1 = new osg::Geode;
-//    geode1->addDrawable(bitmap_in.get());
-//    root->addChild(geode1.get());
-//    osgViewer::Viewer viewer;
-////    viewer.setSceneData(osgDB::readNodeFile("model/blueFlowers.png"));
-//    viewer.setSceneData(root.get());
-//    viewer.realize();
-//    viewer.run();
+////    osgDB::Registry::instance()->getDataFilePathList().push_back("F:\\program\\learnOSG\\model");
+////    osgViewer::Viewer viewer;
+
+////    osg::ref_ptr<osg::Group> root = new osg::Group;
+
+////    viewer.setSceneData(root);
+////    //添加状态事件
+////    viewer.addEventHandler( new osgGA::StateSetManipulator(viewer.getCamera()->getOrCreateStateSet()) );
+
+////    //窗口大小变化事件
+////    viewer.addEventHandler(new osgViewer::WindowSizeHandler);
+
+////    //添加一些常用状态设置
+////    viewer.addEventHandler(new osgViewer::StatsHandler);
+////    viewer.realize();
+////    viewer.run();
+
 //}

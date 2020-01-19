@@ -79,7 +79,10 @@ SOURCES += \
     OSG_EARTH/osgearth_drawable.cpp \
     OSG_EARTH/osgearth_annotation.cpp \
     OSG_EARTH/osgearth_graticule.cpp \
-    OSG_EARTH/osgearth_geodetic_graticule.cpp
+    OSG_EARTH/osgearth_geodetic_graticule.cpp \
+    OSG_Book/q-text.cpp \
+    share2.cpp \
+    OSG_Book/q-texture.cpp
 
 HEADERS += \
     OSG_Book/conduit.h \

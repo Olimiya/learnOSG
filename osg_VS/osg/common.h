@@ -1,8 +1,8 @@
 ﻿#ifndef COMMON_H
 #define COMMON_H
 
-#ifdef _DEBUG
 #include <Windows.h>
+#ifdef _DEBUG
 #pragma comment(lib, "osgd.lib")
 #pragma comment(lib, "osgDBd.lib")
 #pragma comment(lib, "osgViewerd.lib")
@@ -27,10 +27,9 @@
 #pragma comment(lib, "osgUtil.lib")
 #pragma comment(lib, "osgText.lib")
 #pragma comment(lib, "osgWidget.lib")
-#pragma comment(lib, "CEGUIBase.lib")
-#pragma comment(lib, "OpenGLGUIRenderer.lib")
-#pragma comment(lib, "glew32.lib")
-#pragma comment(lib, "glu32.lib")
+//#pragma comment(lib, "OpenGLGUIRenderer.lib")
+//#pragma comment(lib, "glew32.lib")
+//#pragma comment(lib, "glu32.lib")
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "osgShadow.lib")
 #pragma comment(lib, "osgAnimation.lib")
