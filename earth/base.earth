@@ -14,7 +14,4 @@
     <profile srs="spherical-mercator" />
     <cache_policy usage="read_write" />
   </elevation>
-  <extensions>
-    <sky driver="simple" />
-  </extensions>
 </map>

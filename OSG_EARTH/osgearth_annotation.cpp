@@ -40,8 +40,11 @@
 //#include <osgEarthAnnotation/ImageOverlayEditor>
 
 //#include <osgEarthSymbology/GeometryFactory>
+//#include <osgEarthFeatures/GeometryUtils>
 
 //#include <osgViewer/Viewer>
+//#include <QString>
+//#include <qdebug.h>
 
 //using namespace osgEarth;
 //using namespace osgEarth::Annotation;
@@ -56,19 +59,55 @@
 //    OE_WARN << "Usage: " << argv[0] << " <earthfile>" << std::endl;
 //    return -1;
 //}
+//MapNode *g_node = nullptr;
+
+///**
+// * @brief fly
+// * @param e
+// * @param xMin
+// * 左下角经度
+// * @param yMin
+// * 左下角纬度
+// * @param xMax
+// * 右上角经度
+// * @param yMax
+// * 右上角纬度
+// */
+//void fly(EarthManipulator* e, double xMin, double yMin, double xMax, double yMax)
+//{
+//    //中心经度
+//    double xMid = (xMin + xMax) / 2;
+//    //中心纬度
+//    double yMid = (yMin + yMax) / 2;
+
+//    osg::Vec3d p1(xMid, yMid, 0);
+//    osg::Vec3d p2(xMid, yMin, 0);
+
+//    double dyWorld = osgEarth::GeoMath::distance(p1, p2, g_node->getMap()->getSRS());
+//    double fov = e->getLastKnownVFOV();
+//    double tanFov  = tan(osg::DegreesToRadians (fov / 2) );
+//    double height = dyWorld / tanFov;
+
+//    Viewpoint v( "Africa",  xMid, yMid, 0.0, 0.0, -90.0, height );
+//    e->setViewpoint(v, 1.0);
+//}
 
 ////------------------------------------------------------------------
 
 //int
 //main(int argc, char** argv)
 //{
+//    osgDB::Registry::instance()->getDataFilePathList().push_back("F:\\program\\learnOSG");
+
 //    osg::Group* root = new osg::Group();
 
 //    // try to load an earth file.
 //    osg::ArgumentParser arguments(&argc,argv);
 
 //    osgViewer::Viewer viewer(arguments);
-//    viewer.setCameraManipulator( new EarthManipulator() );
+
+//    auto l_earthManipulator = new EarthManipulator();
+//    viewer.setCameraManipulator( l_earthManipulator );
 
 //    // load an earth file and parse demo arguments
 //    osg::Node* node = MapNodeHelper().load(arguments, &viewer);
@@ -79,6 +118,7 @@
 
 //    // find the map node that we loaded.
 //    MapNode* mapNode = MapNode::findMapNode(node);
+//    g_node = mapNode;
 //    if ( !mapNode )
 //        return usage(argv);
 
@@ -104,13 +144,13 @@
 //    //--------------------------------------------------------------------
 
 //    // A series of place nodes (an icon with a text label)
-////    {
-////        Style pm;
-////        pm.getOrCreate<IconSymbol>()->url()->setLiteral( "../data/placemark32.png" );
-////        pm.getOrCreate<IconSymbol>()->declutter() = true;
-////        pm.getOrCreate<TextSymbol>()->halo() = Color("#5f5f5f");
+//    {
+//        Style pm;
+//        pm.getOrCreate<IconSymbol>()->url()->setLiteral( "data/placemark32.png" );
+//        pm.getOrCreate<IconSymbol>()->declutter() = true;
+//        pm.getOrCreate<TextSymbol>()->halo() = Color("#5f5f5f");
 
-////        // bunch of pins:
+//        // bunch of pins:
 ////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -74.00, 40.71), "New York"      , pm));
 ////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -77.04, 38.85), "Washington, DC", pm));
 ////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS,-118.40, 33.93), "Los Angeles"   , pm));
@@ -121,68 +161,95 @@
 ////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -80.28, 25.82), "Miami"         , pm));
 ////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS,-117.17, 32.72), "San Diego"     , pm));
 
-////        // test with an LOD:
-////        osg::LOD* lod = new osg::LOD();
-////        lod->addChild( new PlaceNode(GeoPoint(geoSRS, 14.68, 50.0), "Prague", pm), 0.0, 2e6);
-////        labelGroup->addChild( lod );
+//        // test with an LOD:
+//        osg::LOD* lod = new osg::LOD();
+//        lod->addChild( new PlaceNode(GeoPoint(geoSRS, 14.68, 50.0), "Prague", pm), 2e4, 2e8);
+//        labelGroup->addChild( lod );
 
-////        // absolute altitude:
-////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -87.65, 41.90, 1000, ALTMODE_ABSOLUTE), "Chicago", pm));
-////    }
+//        // absolute altitude:
+//        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -87.65, 41.90, 100000, ALTMODE_ABSOLUTE), "Chicago", pm));
+//    }
 
 //    //--------------------------------------------------------------------
 
 //    // a box that follows lines of latitude (rhumb line interpolation, the default)
 //    // and flashes on and off using a cull callback.
-////    {
-////        struct C : public osg::NodeCallback {
-////            void operator()(osg::Node* n, osg::NodeVisitor* nv) {
-////                static int i=0;
-////                i++;
-////                if (i % 100 < 50)
-////                    traverse(n, nv);
-////            }
-////        };
-////        Geometry* geom = new Polygon();
-////        geom->push_back( osg::Vec3d(0,   40, 0) );
-////        geom->push_back( osg::Vec3d(-60, 40, 0) );
-////        geom->push_back( osg::Vec3d(-60, 60, 0) );
-////        geom->push_back( osg::Vec3d(0,   60, 0) );
+//    {
+//        struct C : public osg::NodeCallback {
+//            void operator()(osg::Node* n, osg::NodeVisitor* nv) {
+//                static int i=0;
+//                i++;
+//                if (i % 100 < 50)
+//                    traverse(n, nv);
+//            }
+//        };
+//        Geometry* geom = new Polygon();
+//        geom->push_back( osg::Vec3d(0,   40, 0) );
+//        geom->push_back( osg::Vec3d(-60, 40, 0) );
+//        geom->push_back( osg::Vec3d(-60, 60, 0) );
+//        geom->push_back( osg::Vec3d(0,   60, 0) );
 
-////        Feature* feature = new Feature(geom, geoSRS);
-////        feature->geoInterp() = GEOINTERP_RHUMB_LINE;
+//        Feature* feature = new Feature(geom, geoSRS);
+//        feature->geoInterp() = GEOINTERP_RHUMB_LINE;
 
-////        Style geomStyle;
-////        geomStyle.getOrCreate<LineSymbol>()->stroke()->color() = Color::Cyan;
-////        geomStyle.getOrCreate<LineSymbol>()->stroke()->width() = 5.0f;
-////        geomStyle.getOrCreate<LineSymbol>()->tessellationSize() = 75000;
-////        geomStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
-////        geomStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_GPU;
+//        Style geomStyle;
+//        geomStyle.getOrCreate<LineSymbol>()->stroke()->color() = Color::Cyan;
+//        geomStyle.getOrCreate<LineSymbol>()->stroke()->width() = 5.0f;
+//        geomStyle.getOrCreate<LineSymbol>()->tessellationSize() = 75000;
+//        geomStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
+//        geomStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_GPU;
 
-////        FeatureNode* fnode = new FeatureNode(feature, geomStyle);
+//        FeatureNode* fnode = new FeatureNode(feature, geomStyle);
 
-////        fnode->addCullCallback(new C());
+//        fnode->addCullCallback(new C());
 
-////        annoGroup->addChild( fnode );
+//        annoGroup->addChild( fnode );
 
-////        LabelNode* label = new LabelNode("Rhumb line polygon", labelStyle);
-////        label->setPosition(GeoPoint(geoSRS, -30, 50));
-////        labelGroup->addChild(label);
-////    }
+//        auto area = osgEarth::Features::GeometryUtils::getGeometryArea(geom);
+
+//        LabelNode* label = new LabelNode(QString::number(area).toStdString(), labelStyle);
+//        label->setPosition(GeoPoint(geoSRS, -30, 50));
+//        labelGroup->addChild(label);
+//    }
 
 //    //--------------------------------------------------------------------
 
 //    // another rhumb box that crosses the antimeridian
 //    {
+//        auto worldSRS = mapNode->getMap()->getWorldSRS();
+//        // 经纬高
+//        osg::Vec3d a1(0.0, 0.0, 100000.0);
+//        osg::Vec3d a2(0.0, 20.0, 100000.0);
+//        osg::Vec3d a3(20.0, 20.0, 100000.0);
+//        osg::Vec3d a4(20.0, 0.0, 100000.0);
+//        // 世界坐标
+//        osg::Vec3d b1(0.0, 0.0, 0.0);
+//        osg::Vec3d b2(0.0, 0.0, 0.0);
+//        osg::Vec3d b3(0.0, 0.0, 0.0);
+//        osg::Vec3d b4(0.0, 0.0, 0.0);
+//        geoSRS->transformToWorld(a1, b1);
+//        geoSRS->transformToWorld(a2, b2);
+//        geoSRS->transformToWorld(a3, b3);
+//        geoSRS->transformToWorld(a4, b4);
+//        worldSRS->transformFromWorld(b1, b1);
+//        worldSRS->transformFromWorld(b2, b2);
+//        worldSRS->transformFromWorld(b3, b3);
+//        worldSRS->transformFromWorld(b4, b4);
+
+
 //        Geometry* geom = new Polygon();
-//        geom->push_back( -100., -30. );
-//        geom->push_back(  120., -20. );
-//        geom->push_back(  120., -45. );
-//        geom->push_back( -110., -40. );
+//        geom->push_back(a1);
+//        geom->push_back(a2);
+//        geom->push_back(a3);
+//        geom->push_back(a4);
+////        geom->push_back(b1);
+////        geom->push_back(b2);
+////        geom->push_back(b3);
+////        geom->push_back(b4);
 //        Style geomStyle;
 
 //        Feature* feature = new Feature(geom, geoSRS);
-//        feature->geoInterp() = GEOINTERP_RHUMB_LINE;
+////        feature->geoInterp() = GEOINTERP_RHUMB_LINE;
 
 //        geomStyle.getOrCreate<LineSymbol>()->stroke()->color() = Color::Lime;
 //        geomStyle.getOrCreate<LineSymbol>()->stroke()->width() = 3.0f;
@@ -193,9 +260,11 @@
 //        FeatureNode* gnode = new FeatureNode(feature, geomStyle);
 //        annoGroup->addChild( gnode );
 
-//        LabelNode* label = new LabelNode("Antimeridian polygon", labelStyle);
-//        label->setPosition(GeoPoint(geoSRS, -175, -35));
-//        labelGroup->addChild(label);
+////        auto area = osgEarth::Features::GeometryUtils::getGeometryArea(geom);
+
+////        LabelNode* label = new LabelNode(QString::number(area).toStdString(), labelStyle);
+////        label->setPosition(GeoPoint(worldSRS,b1));
+////        labelGroup->addChild(label);
 //    }
 
 //    //--------------------------------------------------------------------
@@ -230,7 +299,7 @@
 //        pathNode = new FeatureNode(pathFeature, pathStyle);
 //        annoGroup->addChild( pathNode );
 
-//        LabelNode* label = new LabelNode("Great circle path", labelStyle);
+//        LabelNode* label = new LabelNode("你好", labelStyle);
 //        label->setPosition(GeoPoint(geoSRS,-170, 61.2));
 //        labelGroup->addChild(label);
 //    }
@@ -363,18 +432,18 @@
 //    //--------------------------------------------------------------------
 
 //    // an image overlay.
-////    {
-////        ImageOverlay* imageOverlay = 0L;
-////        osg::ref_ptr<osg::Image> image = osgDB::readRefImageFile( "../data/USFLAG.TGA" );
-////        if (image.valid())
-////        {
-////            imageOverlay = new ImageOverlay(mapNode, image.get());
-////            imageOverlay->setBounds( Bounds( -100.0, 35.0, -90.0, 40.0) );
-////            annoGroup->addChild( imageOverlay );
+//    {
+//        ImageOverlay* imageOverlay = 0L;
+//        osg::ref_ptr<osg::Image> image = osgDB::readRefImageFile( "model/test2.svg" );
+//        if (image.valid())
+//        {
+//            imageOverlay = new ImageOverlay(mapNode, image.get());
+//            imageOverlay->setBounds( Bounds( -100.0, 35.0, -90.0, 50.0) );
+//            annoGroup->addChild( imageOverlay );
 
-////            editGroup->addChild( new ImageOverlayEditor(imageOverlay) );
-////        }
-////    }
+//            editGroup->addChild( new ImageOverlayEditor(imageOverlay) );
+//        }
+//    }
 
 //    //--------------------------------------------------------------------
 
@@ -382,19 +451,13 @@
 ////    {
 ////        Style style;
 ////        style.getOrCreate<ModelSymbol>()->autoScale() = true;
-////        style.getOrCreate<ModelSymbol>()->url()->setLiteral("../data/red_flag.osg.50.scale");
+////        style.getOrCreate<ModelSymbol>()->url()->setLiteral("data/red_flag.osg.50.scale");
 ////        ModelNode* modelNode = new ModelNode(mapNode, style);
 ////        modelNode->setPosition(GeoPoint(geoSRS, -100, 52));
 ////        annoGroup->addChild(modelNode);
 ////    }
 
 //    //--------------------------------------------------------------------
-
-//    osgEarth::Util::GeodeticGraticule* gr = new osgEarth::Util::GeodeticGraticule();
-////    gr->init();
-////    gr->addedToMap(mapNode->getMap());
-//    mapNode->getMap()->addLayer(gr);
-////    gr->init();
 
 //    // initialize the viewer:
 //    viewer.setSceneData( root );

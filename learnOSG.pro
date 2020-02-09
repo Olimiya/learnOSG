@@ -82,7 +82,10 @@ SOURCES += \
     OSG_EARTH/osgearth_geodetic_graticule.cpp \
     OSG_Book/q-text.cpp \
     share2.cpp \
-    OSG_Book/q-texture.cpp
+    OSG_Book/q-texture.cpp \
+    OSG_EARTH/osgearth_imageoverlay.cpp \
+    OSG_EARTH/osgearth_manipulator.cpp \
+    OSG/createconcavepolygon.cpp
 
 HEADERS += \
     OSG_Book/conduit.h \

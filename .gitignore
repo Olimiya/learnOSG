@@ -4,3 +4,6 @@
 osg_VS/.vs/osg/v15/.suo
 osg_VS/osg/model
 x64
+cache
+cache_dir
+.svn
