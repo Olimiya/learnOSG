@@ -307,85 +307,85 @@
 //    //--------------------------------------------------------------------
 
 //    // Two circle segments around New Orleans.
-////    {
-////        Style circleStyle;
-////        circleStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Cyan, 0.5);
-////        circleStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
-////        circleStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_DRAPE;
+//    {
+//        Style circleStyle;
+//        circleStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Cyan, 0.5);
+//        circleStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
+//        circleStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_DRAPE;
 
-////        CircleNode* circle = new CircleNode();
-////        circle->set(
-////            GeoPoint(geoSRS, -90.25, 29.98, 1000., ALTMODE_RELATIVE),
-////            Distance(300, Units::KILOMETERS),
-////            circleStyle,
-////            Angle(-45.0, Units::DEGREES),
-////            Angle(45.0, Units::DEGREES),
-////            true);
+//        CircleNode* circle = new CircleNode();
+//        circle->set(
+//            GeoPoint(geoSRS, -90.25, 29.98, 1000., ALTMODE_RELATIVE),
+//            Distance(300, Units::KILOMETERS),
+//            circleStyle,
+//            Angle(-45.0, Units::DEGREES),
+//            Angle(45.0, Units::DEGREES),
+//            true);
 
-////        annoGroup->addChild( circle );
+//        annoGroup->addChild( circle );
 
-////        editGroup->addChild( new CircleNodeEditor(circle) );
-////    }
+//        editGroup->addChild( new CircleNodeEditor(circle) );
+//    }
 
-////    {
-////        Style circleStyle;
-////        circleStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Red, 0.5);
-////        circleStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
-////        circleStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_DRAPE;
+//    {
+//        Style circleStyle;
+//        circleStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Red, 0.5);
+//        circleStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
+//        circleStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_DRAPE;
 
-////        CircleNode* circle = new CircleNode();
-////        circle->set(
-////            GeoPoint(geoSRS, -90.25, 29.98, 1000., ALTMODE_RELATIVE),
-////            Distance(300, Units::KILOMETERS),
-////            circleStyle,
-////            Angle(45.0, Units::DEGREES),
-////            Angle(360.0 - 45.0, Units::DEGREES),
-////            true);
+//        CircleNode* circle = new CircleNode();
+//        circle->set(
+//            GeoPoint(geoSRS, -90.25, 29.98, 1000., ALTMODE_RELATIVE),
+//            Distance(300, Units::KILOMETERS),
+//            circleStyle,
+//            Angle(45.0, Units::DEGREES),
+//            Angle(360.0 - 45.0, Units::DEGREES),
+//            true);
 
-////        annoGroup->addChild( circle );
+//        annoGroup->addChild( circle );
 
-////        editGroup->addChild( new CircleNodeEditor(circle) );
-////    }
+//        editGroup->addChild( new CircleNodeEditor(circle) );
+//    }
 
 //    //--------------------------------------------------------------------
 
 //    // An extruded ellipse around Miami.
-////    {
-////        Style ellipseStyle;
-////        ellipseStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Orange, 0.75);
-////        ellipseStyle.getOrCreate<ExtrusionSymbol>()->height() = 250000.0; // meters MSL
-////        EllipseNode* ellipse = new EllipseNode();
-////        ellipse->set(
-////            GeoPoint(geoSRS, -80.28, 25.82, 0.0, ALTMODE_RELATIVE),
-////            Distance(250, Units::MILES),
-////            Distance(100, Units::MILES),
-////            Angle   (0, Units::DEGREES),
-////            ellipseStyle,
-////            Angle(45.0, Units::DEGREES),
-////            Angle(360.0 - 45.0, Units::DEGREES),
-////            true);
-////        annoGroup->addChild( ellipse );
+//    {
+//        Style ellipseStyle;
+//        ellipseStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Orange, 0.75);
+//        ellipseStyle.getOrCreate<ExtrusionSymbol>()->height() = 250000.0; // meters MSL
+//        EllipseNode* ellipse = new EllipseNode();
+//        ellipse->set(
+//            GeoPoint(geoSRS, -80.28, 25.82, 0.0, ALTMODE_RELATIVE),
+//            Distance(250, Units::MILES),
+//            Distance(100, Units::MILES),
+//            Angle   (0, Units::DEGREES),
+//            ellipseStyle,
+//            Angle(45.0, Units::DEGREES),
+//            Angle(360.0 - 45.0, Units::DEGREES),
+//            true);
+//        annoGroup->addChild( ellipse );
 
-////        editGroup->addChild( new EllipseNodeEditor(ellipse) );
-////    }
-////    {
-////        Style ellipseStyle;
-////        ellipseStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Blue, 0.75);
-////        ellipseStyle.getOrCreate<ExtrusionSymbol>()->height() = 250000.0; // meters MSL
-////        EllipseNode* ellipse = new EllipseNode();
-////        ellipse->set(
-////            GeoPoint(geoSRS, -80.28, 25.82, 0.0, ALTMODE_RELATIVE),
-////            Distance(250, Units::MILES),
-////            Distance(100, Units::MILES),
-////            Angle   (0, Units::DEGREES),
-////            ellipseStyle,
-////            Angle(-40.0, Units::DEGREES),
-////            Angle(40.0, Units::DEGREES),
-////            true);
-////        annoGroup->addChild( ellipse );
+//        editGroup->addChild( new EllipseNodeEditor(ellipse) );
+//    }
+//    {
+//        Style ellipseStyle;
+//        ellipseStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Blue, 0.75);
+//        ellipseStyle.getOrCreate<ExtrusionSymbol>()->height() = 250000.0; // meters MSL
+//        EllipseNode* ellipse = new EllipseNode();
+//        ellipse->set(
+//            GeoPoint(geoSRS, -80.28, 25.82, 0.0, ALTMODE_RELATIVE),
+//            Distance(250, Units::MILES),
+//            Distance(100, Units::MILES),
+//            Angle   (0, Units::DEGREES),
+//            ellipseStyle,
+//            Angle(-40.0, Units::DEGREES),
+//            Angle(40.0, Units::DEGREES),
+//            true);
+//        annoGroup->addChild( ellipse );
 
-////        editGroup->addChild( new EllipseNodeEditor(ellipse) );
-////    }
+//        editGroup->addChild( new EllipseNodeEditor(ellipse) );
+//    }
 
 //    //--------------------------------------------------------------------
 

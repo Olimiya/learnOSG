@@ -29,16 +29,27 @@ INCLUDEPATH += \
                 $$(OSG_DIR)/include \
                 $$(OSGEARTH_DIR)/include
 
+CONFIG(debug, debug|release){
 LIBS += \
     -L$$(OSG_3RPARTY_DIR)/lib \
-        -lfreetyped -lgdal_i -lgeos -lgeos_cd -lgeosd -lglut32 -ljpeg -llibcurl_imp -llibgeosd \
-        -llibpng16 -llibpng16_staticd -llibpng16d -logr -lproj_4_9_d -ltiffd -lzlibd -lzlibstaticd \
+        -lfreetyped -lgdal_i -lgeos_cd -lgeosd -lglut32d -ljpeg -llibcurl_imp -llibgeosd \
+        -llibpng16_staticd -llibpng16d -logr -lproj_4_9_d -ltiffd -lzlibd -lzlibstaticd \
     -L$$(OSGEARTH_DIR)/lib \
         -losgEarthd -losgEarthAnnotationd -losgEarthFeaturesd -losgEarthQt5d -losgEarthSplatd -losgEarthSymbologyd -losgEarthUtild \
     -L$$(OSG_DIR)/lib \
         -lOpenThreadsd -losgd -lOsgAnimationd -losgDBd -losgFXd -losgGAd -losgManipulatord -losgParticled -losgPresentationd \
         -losgQt5d -losgShadowd -losgSimd -losgTerraind -losgTextd -losgUId -losgUtild -losgViewerd -losgVolumed -losgWidgetd
-
+} else {
+LIBS += \
+    -L$$(OSG_3RPARTY_DIR)/lib \
+        -lfreetype -lgdal_i -lgeos -lgeos_c -lglut32 -ljpeg -llibcurl_imp -llibgeos \
+        -llibpng16 -llibpng16_static -logr -lproj_4_9 -ltiff -lzlib -lzlibstatic \
+    -L$$(OSGEARTH_DIR)/lib \
+        -losgEarth -losgEarthAnnotation -losgEarthFeatures -losgEarthQt5 -losgEarthSplat -losgEarthSymbology -losgEarthUtil \
+    -L$$(OSG_DIR)/lib \
+        -lOpenThreads -losg -lOsgAnimation -losgDB -losgFX -losgGA -losgManipulator -losgParticle -losgPresentation \
+        -losgQt5 -losgShadow -losgSim -losgTerrain -losgText -losgUI -losgUtil -losgViewer -losgVolume -losgWidget
+}
 
 SOURCES += \
     OSG_Book/10-1showtext.cpp \
@@ -85,7 +96,8 @@ SOURCES += \
     OSG_Book/q-texture.cpp \
     OSG_EARTH/osgearth_imageoverlay.cpp \
     OSG_EARTH/osgearth_manipulator.cpp \
-    OSG/createconcavepolygon.cpp
+    OSG/createconcavepolygon.cpp \
+    OSG_EARTH/osgearth_controls.cpp
 
 HEADERS += \
     OSG_Book/conduit.h \

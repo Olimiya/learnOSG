@@ -88,6 +88,11 @@ void MAP_OSG_ViewController::removeView(MAP_OSG_BaseViewer *baseViewer)
 {
     __initializeIfNot();
     m_instance->m_viewer.removeView(baseViewer->getView());
+    if(m_instance)
+    {
+        m_instance->deleteLater();
+        m_instance = nullptr;
+    }
 }
 
 void MAP_OSG_ViewController::paint()

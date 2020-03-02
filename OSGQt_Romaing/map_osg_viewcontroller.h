@@ -18,13 +18,11 @@
 #include <QMessageBox>
 #include "map_osg_baseviewer.h"
 
-
 class MAP_OSG_ViewController : public QObject
 {
     Q_OBJECT
 public:
     ~MAP_OSG_ViewController();
-
     static MAP_OSG_BaseViewer *addView(const QString &earthFilePath);
     static void removeView(MAP_OSG_BaseViewer *baseViewer);
 
@@ -37,9 +35,9 @@ private:
     static inline void __initializeIfNot();
     explicit MAP_OSG_ViewController();
 
+
     QTimer m_timer;
     osgViewer::CompositeViewer m_viewer;
-
     static MAP_OSG_ViewController *m_instance;
 };
 #endif // MAP_OSG_VIEWCONTROLLER_H

@@ -14,13 +14,16 @@ class OSG_RomaingWindow : public QMainWindow
 
 public:
     explicit OSG_RomaingWindow(QWidget *parent = nullptr);
-    ~OSG_RomaingWindow();
+    static OSG_RomaingWindow* getInstance();
+    ~OSG_RomaingWindow() override;
 
 protected:
     //virtual void keyPressEvent(QKeyEvent *event);
+    virtual void closeEvent(QCloseEvent *evnet) override;
 
 private:
     Ui::OSG_RomaingWindow *ui;
+    static OSG_RomaingWindow* instance;
     MAP_OSG_BaseViewer *m_osgWidget;
 };
 

@@ -7,3 +7,9 @@ x64
 cache
 cache_dir
 .svn
+debug
+release
+*.sln
+*.vcxproj*
+*.user.*
+*.stash

@@ -38,6 +38,8 @@
 
 //#include <osgEarthAnnotation/ImageOverlay>
 //#include <osgEarthAnnotation/ImageOverlayEditor>
+//#include <QString>
+//#include <QDebug>
 
 //using namespace osgEarth;
 //using namespace osgEarth::Annotation;
@@ -62,7 +64,6 @@
 //    //s_layerBox->setVertAlign( Control::ALIGN_TOP  );
 //    s_layerBox->setVertAlign( Control::ALIGN_RIGHT  );
 //    s_layerBox->setHorizAlign( Control::ALIGN_RIGHT );
-
 
 //    canvas->addControl( s_layerBox );
 //    return canvas;
@@ -192,8 +193,7 @@
 
 //    if (imageFiles.empty())
 //    {
-//        imageFiles.push_back("model/compass_arrow.png");
-//        imageFiles.push_back("model/compass_arrow.png");
+//        imageFiles.push_back("model/1.jpg");
 //        imageBounds.push_back( Bounds(-100, 38, -98, 40) );
 //    }
 //    osg::Vec2 center(-95, 35);
@@ -256,7 +256,7 @@
 //            ImageOverlay* overlay = new ImageOverlay(mapNode);
 //            overlay->setImage( image );
 //            overlay->setBounds(imageBounds[i]);
-////            overlay->setCenter(center.x(), center.y());
+//            //            overlay->setCenter(center.x(), center.y());
 //            //            overlay->addCallback(new )
 
 //            mapNode->addChild( overlay );
@@ -278,12 +278,12 @@
 //            CheckBoxControl* enabled = new CheckBoxControl( true );
 //            enabled->addEventHandler( new EnabledHandler(overlay) );
 //            enabled->setVertAlign( Control::ALIGN_CENTER );
-////            s_layerBox->setControl( 1, i, enabled );
+//            //            s_layerBox->setControl( 1, i, enabled );
 
 //            //The overlay name
 //            LabelControl* name = new LabelControl( osgDB::getSimpleFileName( imageFile) );
 //            name->setVertAlign( Control::ALIGN_CENTER );
-////            s_layerBox->setControl( 2, i, name );
+//            //            s_layerBox->setControl( 2, i, name );
 
 //            // an opacity slider
 //            HSliderControl* opacity = new HSliderControl( 0.0f, 1.0f, overlay->getAlpha() );
@@ -291,13 +291,13 @@
 //            opacity->setHeight( 12 );
 //            opacity->setVertAlign( Control::ALIGN_CENTER );
 //            opacity->addEventHandler( new OpacityHandler(overlay) );
-////            s_layerBox->setControl( 3, i, opacity );
+//            //            s_layerBox->setControl( 3, i, opacity );
 
 //            // Add a text label:
 //            LabelControl* edit = new LabelControl( "Edit" );
 //            edit->setVertAlign( Control::ALIGN_CENTER );
 //            edit->addEventHandler(new EditHandler(overlay, &viewer, editor));
-////            s_layerBox->setControl(4, i, edit );
+//            //            s_layerBox->setControl(4, i, edit );
 //        }
 //    }
 
@@ -307,6 +307,6 @@
 //    viewer.addEventHandler(new osgViewer::LODScaleHandler());
 //    viewer.addEventHandler(new osgGA::StateSetManipulator(viewer.getCamera()->getOrCreateStateSet()));
 //    viewer.addEventHandler(new osgViewer::HelpHandler(arguments.getApplicationUsage()));
-
+//    viewer.getCamera()->setSmallFeatureCullingPixelSize(-1.0f);
 //    return viewer.run();
 //}
