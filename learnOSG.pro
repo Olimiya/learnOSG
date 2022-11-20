@@ -97,7 +97,9 @@ SOURCES += \
     OSG_EARTH/osgearth_imageoverlay.cpp \
     OSG_EARTH/osgearth_manipulator.cpp \
     OSG/createconcavepolygon.cpp \
-    OSG_EARTH/osgearth_controls.cpp
+    OSG_EARTH/osgearth_controls.cpp \
+    OSG_EARTH/osgearth_pick.cpp \
+    OSG_EARTH/osgearth_addlayer.cpp
 
 HEADERS += \
     OSG_Book/conduit.h \

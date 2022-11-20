@@ -5,7 +5,6 @@
 /// 用于控制osgViewer::View的刷新以及地图的读取。
 /// 参考MAP_OSG_ExampleWindow使用该类读取地图。
 
-
 #include <QObject>
 #include <osg/Notify>
 #include <osgViewer/CompositeViewer>
@@ -22,7 +21,6 @@ class MAP_OSG_ViewController : public QObject
 {
     Q_OBJECT
 public:
-    ~MAP_OSG_ViewController();
     static MAP_OSG_BaseViewer *addView(const QString &earthFilePath);
     static void removeView(MAP_OSG_BaseViewer *baseViewer);
 
@@ -34,7 +32,6 @@ public slots:
 private:
     static inline void __initializeIfNot();
     explicit MAP_OSG_ViewController();
-
 
     QTimer m_timer;
     osgViewer::CompositeViewer m_viewer;

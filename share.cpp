@@ -1,6 +1,6 @@
 ﻿///* -*-c++-*- */
-///* osgEarth - Dynamic map generation toolkit for OpenSceneGraph
-//* Copyright 2016 Pelican Mapping
+///* osgEarth - Geospatial SDK for OpenSceneGraph
+//* Copyright 2019 Pelican Mapping
 //* http://osgearth.org
 //*
 //* osgEarth is free software; you can redistribute it and/or modify
@@ -20,259 +20,443 @@
 //* along with this program.  If not, see <http://www.gnu.org/licenses/>
 //*/
 
-///**
-// * This app demonstrates the use of TerrainEngine::createTile(), which lets
-// * you create the geometry for an arbitrary terrain tile that you can use for
-// * external purposes.
-// */
-
-//#include <osgGA/StateSetManipulator>
-//#include <osgGA/GUIEventHandler>
-//#include <osgViewer/Viewer>
-//#include <osgViewer/ViewerEventHandlers>
-//#include <osgUtil/LineSegmentIntersector>
 //#include <osgEarth/MapNode>
-//#include <osgEarth/TerrainEngineNode>
-//#include <osgEarth/StringUtils>
-//#include <osgEarth/Terrain>
-//#include <osgEarth/GeoTransform>
+
 //#include <osgEarthUtil/EarthManipulator>
-//#include <osgEarthUtil/Controls>
 //#include <osgEarthUtil/ExampleResources>
-//#include <osg/TriangleFunctor>
-//#include <osgDB/WriteFile>
-//#include <iomanip>
+
+//#include <osgEarthAnnotation/ImageOverlay>
+//#include <osgEarthAnnotation/CircleNode>
+//#include <osgEarthAnnotation/RectangleNode>
+//#include <osgEarthAnnotation/EllipseNode>
+//#include <osgEarthAnnotation/PlaceNode>
+//#include <osgEarthAnnotation/LabelNode>
+//#include <osgEarthAnnotation/LocalGeometryNode>
+//#include <osgEarthAnnotation/FeatureNode>
+//#include <osgEarthAnnotation/ModelNode>
+
+//#include <osgEarthAnnotation/AnnotationEditing>
+//#include <osgEarthAnnotation/ImageOverlayEditor>
+
+//#include <osgEarthSymbology/GeometryFactory>
+//#include <osgEarth/NodeUtils>
+
+//#include <osgViewer/Viewer>
+//#include <QString>
 
 //using namespace osgEarth;
+//using namespace osgEarth::Annotation;
+//using namespace osgEarth::Features;
 //using namespace osgEarth::Util;
 
-//static MapNode*       s_mapNode     = 0L;
-//static osg::Group*    s_root        = 0L;
-//static osg::ref_ptr< osg::Node >  marker = osgDB::readNodeFile("../data/red_flag.osg");
+////------------------------------------------------------------------
 
-//struct CollectTriangles
+//int
+//usage( char** argv )
 //{
-//    CollectTriangles()
-//    {
-//        verts = new osg::Vec3Array();
-//    }
-//#if OSG_VERSION_LESS_THAN(3,5,6)
-//    inline void operator () (const osg::Vec3& v1,const osg::Vec3& v2,const osg::Vec3& v3, bool treatVertexDataAsTemporary)
-//#else
-//    inline void operator () (const osg::Vec3& v1,const osg::Vec3& v2,const osg::Vec3& v3)
-//#endif
-//    {
-//        verts->push_back(v1);
-//        verts->push_back(v2);
-//        verts->push_back(v3);
-//    }
+//    OE_WARN << "Usage: " << argv[0] << " <earthfile>" << std::endl;
+//    return -1;
+//}
 
-//    osg::ref_ptr< osg::Vec3Array > verts;
-//};
-
-//struct CollectTrianglesVisitor : public osg::NodeVisitor
+////------------------------------------------------------------------
+//int main(int argc, char **argv)
 //{
-//    CollectTrianglesVisitor():
-//        osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
+//    auto viewer = osgViewer::Viewer();
+//    auto mpViewer = &viewer;
+
+//    osg::DisplaySettings *ds = new osg::DisplaySettings;
+//    ds->setNumMultiSamples(4);
+//    mpViewer->setDisplaySettings(ds);
+
+//    //QString earthFile = QCoreApplication::applicationDirPath() + QStringLiteral("/data/terrain/Projected.earth");
+//    //osg::ref_ptr<osgEarth::MapNode> mapNode = osgEarth::MapNode::findMapNode(osgDB::readNodeFile("./data/terrain/scenario.earth"));
+
+//    osg::Node *node = osgDB::readNodeFile(
+//                          QStringLiteral("F:/program/Sim8Osg/Reference/ScenarioPlatform/binV2/data/terrain/world.earth").toLocal8Bit().constData());
+//    osg::ref_ptr<osgEarth::MapNode> mapNode = osgEarth::MapNode::findMapNode(node);
+//    if (mapNode.valid())
 //    {
-//        _vertices = new osg::Vec3dArray();
+//        mpViewer->getDatabasePager()->setDoPreCompile(true);
+//        mpViewer->getDatabasePager()->setUpThreads(2);
+
+//        osg::ref_ptr<osg::Group> root = new osg::Group;
+//        root->addChild(mapNode);
+//        mpViewer->setSceneData(root);
+
+//        auto mpMatrixTransform = new osg::MatrixTransform;
+//        osgEarth::insertGroup(mpMatrixTransform, mapNode);
+
+//        auto mpMapNode = mapNode;
 //    }
+//    mpViewer->getCamera()->setNearFarRatio(0.000003);
+//    mpViewer->getCamera()->setClearMask(mpViewer->getCamera()->getClearMask() | GL_STENCIL_BUFFER_BIT);
+//    mpViewer->getCamera()->setClearStencil(0);
+//    mpViewer->setUpViewOnSingleScreen(0);
+//    mpViewer->setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
 
-//    void apply(osg::Transform& transform)
-//    {
-//        osg::Matrix matrix;
-//        if (!_matrixStack.empty()) matrix = _matrixStack.back();
-
-//        transform.computeLocalToWorldMatrix(matrix,this);
-
-//        pushMatrix(matrix);
-
-//        traverse(transform);
-
-//        popMatrix();
-//    }
-
-//    void apply(osg::Geode& geode)
-//    {
-//        for(unsigned int i=0; i<geode.getNumDrawables(); ++i)
-//        {
-//            osg::TriangleFunctor<CollectTriangles> triangleCollector;
-//            geode.getDrawable(i)->accept(triangleCollector);
-//            for (unsigned int j = 0; j < triangleCollector.verts->size(); j++)
-//            {
-//                osg::Matrix& matrix = _matrixStack.back();
-//                osg::Vec3d v = (*triangleCollector.verts)[j];
-//                _vertices->push_back(v * matrix);
-//            }
-//        }
-//    }
-
-//    osg::Node* buildNode()
-//    {
-//        osg::Geometry* geom = new osg::Geometry;
-//        osg::Vec3Array* verts = new osg::Vec3Array;
-//        geom->setVertexArray(verts);
-//        osg::Vec4ubArray* colors = new osg::Vec4ubArray(1);
-//        (*colors)[0] = osg::Vec4ub(255,0,0,255);
-//        geom->setColorArray(colors);
-//        geom->setColorBinding(osg::Geometry::BIND_OVERALL);
-
-//        bool first = true;
-//        osg::Vec3d anchor;
-
-//        for (unsigned int i = 0; i < _vertices->size(); i++)
-//        {
-//            if (first)
-//            {
-//                anchor = (*_vertices)[i];
-//                first = false;
-//            }
-//            verts->push_back((*_vertices)[i] - anchor);
-//        }
-
-//        OSG_NOTICE << "Building scene with " << verts->size() << " verts" << std::endl;
-
-//        osg::MatrixTransform* mt = new osg::MatrixTransform;
-//        mt->setMatrix(osg::Matrixd::translate(anchor));
-
-//        osg::Geode* geode = new osg::Geode;
-//        geode->addDrawable(geom);
-//        geode->setCullingActive( false );
-//        geom->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, verts->size()));
-//        mt->addChild(geode);
-//        //mt->getOrCreateStateSet()->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-//        mt->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-//        mt->getOrCreateStateSet()->setRenderBinDetails(99, "RenderBin");
-
-//        osg::BoundingSphere bs = mt->getBound();
-//        bs.radius() = bs.radius() * 100;
-//        mt->setInitialBound(bs);
-//        mt->dirtyBound();
-
-//        return mt;
-//    }
-
-//    inline void pushMatrix(osg::Matrix& matrix) { _matrixStack.push_back(matrix); }
-
-//    inline void popMatrix() { _matrixStack.pop_back(); }
-
-//    typedef std::vector<osg::Matrix> MatrixStack;
-//    osg::ref_ptr<osg::Vec3dArray>  _vertices;
-//    MatrixStack _matrixStack;
-//};
-
-
-
-
-//// An event handler that will create a tile that can be used for intersections
-//struct CreateTileHandler : public osgGA::GUIEventHandler
-//{
-//    CreateTileHandler()
-//    {
-//    }
-
-//    void update( float x, float y, osgViewer::View* view )
-//    {
-//        bool yes = false;
-
-//        // look under the mouse:
-//        osg::Vec3d world;
-//        osgUtil::LineSegmentIntersector::Intersections hits;
-//        if ( view->computeIntersections(x, y, hits) )
-//        {
-//            world = hits.begin()->getWorldIntersectPoint();
-
-//            // convert to map coords:
-//            GeoPoint mapPoint;
-//            mapPoint.fromWorld( s_mapNode->getMapSRS(), world );
-
-//            // Depending on the level of detail key you request, you will get a mesh that should line up exactly with the highest resolution mesh that the terrain engine will draw.
-//            // At level 15 that is a 257x257 heightfield.  If you select a higher lod, the mesh will be less dense.
-//            TileKey key = s_mapNode->getMap()->getProfile()->createTileKey(mapPoint.x(), mapPoint.y(), 15);
-//            OE_NOTICE << "Creating tile " << key.str() << std::endl;
-//            osg::ref_ptr<osg::Node> node = s_mapNode->getTerrainEngine()->createTile(key);
-//            if (node.valid())
-//            {
-//                // Extract the triangles from the node that was created and do our own rendering.  Simulates what you would do when passing in the triangles to a physics engine.
-//                OE_NOTICE << "Created tile for " << key.str() << std::endl;
-//                CollectTrianglesVisitor v;
-//                node->accept(v);
-//                node = v.buildNode();
-
-//                if (_node.valid())
-//                {
-//                    s_root->removeChild( _node.get() );
-//                }
-
-//                osg::Group* group = new osg::Group;
-
-//                // Show the actual mesh.
-//                group->addChild( node.get() );
-
-//                _node = group;
-
-//                // Clamp the marker to the intersection of the triangles created by osgEarth.  This should line up with the mesh that is actually rendered.
-//                double z = 0.0;
-//                s_mapNode->getTerrain()->getHeight( node.get(), s_mapNode->getMapSRS(), mapPoint.x(), mapPoint.y(), &z);
-
-//                GeoTransform* xform = new GeoTransform();
-//                xform->setPosition( osgEarth::GeoPoint(s_mapNode->getMapSRS(),mapPoint.x(),  mapPoint.y(), z, ALTMODE_ABSOLUTE) );
-//                xform->addChild( marker.get() );
-//                group->addChild( xform );
-
-//                s_root->addChild( _node.get() );
-//            }
-//            else
-//            {
-//                OE_NOTICE << "Failed to create tile for " << key.str() << std::endl;
-//            }
-//        }
-//    }
-
-//    bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa )
-//    {
-//        if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH && ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON)
-//        {
-//            osgViewer::View* view = static_cast<osgViewer::View*>(aa.asView());
-//            update( ea.getX(), ea.getY(), view );
-//        }
-
-//        return false;
-//    }
-
-//    osg::ref_ptr< osg::Node > _node;
-//};
-
-
-//int main(int argc, char** argv)
-//{
-//    osg::ArgumentParser arguments(&argc,argv);
-
-//    osgViewer::Viewer viewer(arguments);
-
-//    s_root = new osg::Group();
-
-//    // install the programmable manipulator.
-//    viewer.setCameraManipulator( new osgEarth::Util::EarthManipulator() );
-
-//    // The MapNode will render the Map object in the scene graph.
-//    osg::Node* node = MapNodeHelper().load(arguments, &viewer);
-//    s_mapNode = MapNode::findMapNode(node);
-//    s_root->addChild( node );
-
-//    // disable the small-feature culling
-//    viewer.getCamera()->setSmallFeatureCullingPixelSize(-1.0f);
-
-//    // set a near/far ratio that is smaller than the default. This allows us to get
-//    // closer to the ground without near clipping. If you need more, use --logdepth
-//    viewer.getCamera()->setNearFarRatio(0.0001);
-//    viewer.getCamera()->setComputeNearFarMode( osg::CullSettings::COMPUTE_NEAR_FAR_USING_BOUNDING_VOLUMES );
-
-
-//    // An event handler that will respond to mouse clicks:
-//    viewer.addEventHandler( new CreateTileHandler() );
-
-//    viewer.setSceneData( s_root );
-
+////    viewer.getCamera()->setSmallFeatureCullingPixelSize(-1.0f);
 //    return viewer.run();
 //}
+
+////simple
+////int main(int argc, char **argv)
+////{
+////    osg::Group* root = new osg::Group();
+
+////    osg::ArgumentParser arguments(&argc,argv);
+
+////    osgViewer::Viewer viewer(arguments);
+////    // load an earth file and parse demo arguments
+////    osg::Node* node = MapNodeHelper().load(arguments, &viewer);
+////    if ( !node )
+////        return usage(argv);
+
+////    root->addChild( node );
+
+////    // find the map node that we loaded.
+////    MapNode* mapNode = MapNode::findMapNode(node);
+////    if ( !mapNode )
+////        return usage(argv);
+////    viewer.setSceneData( root );
+////    viewer.getCamera()->setSmallFeatureCullingPixelSize(-1.0f);
+////    return viewer.run();
+////}
+
+
+//// annotation
+////int
+////main(int argc, char** argv)
+////{
+////    osg::Group* root = new osg::Group();
+
+////    // try to load an earth file.
+////    osg::ArgumentParser arguments(&argc,argv);
+
+////    osgViewer::Viewer viewer(arguments);
+////    viewer.setCameraManipulator( new EarthManipulator() );
+
+////    // load an earth file and parse demo arguments
+////    osg::Node* node = MapNodeHelper().load(arguments, &viewer);
+////    if ( !node )
+////        return usage(argv);
+
+////    root->addChild( node );
+
+////    // find the map node that we loaded.
+////    MapNode* mapNode = MapNode::findMapNode(node);
+////    if ( !mapNode )
+////        return usage(argv);
+
+////    // Group to hold all our annotation elements.
+////    osg::Group* annoGroup = new osg::Group();
+////    MapNode::get(node)->addChild( annoGroup );
+
+////    // Make a group for labels
+////    osg::Group* labelGroup = new osg::Group();
+////    annoGroup->addChild( labelGroup );
+
+////    osg::Group* editGroup = new osg::Group();
+////    MapNode::get(node)->addChild( editGroup );
+
+////    // Style our labels:
+////    Style labelStyle;
+////    labelStyle.getOrCreate<TextSymbol>()->alignment() = TextSymbol::ALIGN_CENTER_CENTER;
+////    labelStyle.getOrCreate<TextSymbol>()->fill()->color() = Color::Yellow;
+
+////    // A lat/long SRS for specifying points.
+////    const SpatialReference* geoSRS = mapNode->getMapSRS()->getGeographicSRS();
+
+////    //--------------------------------------------------------------------
+
+////    // A series of place nodes (an icon with a text label)
+////    {
+////        Style pm;
+////        pm.getOrCreate<IconSymbol>()->url()->setLiteral( "../data/placemark32.png" );
+////        pm.getOrCreate<IconSymbol>()->declutter() = true;
+////        pm.getOrCreate<TextSymbol>()->halo() = Color("#5f5f5f");
+
+////        // bunch of pins:
+////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -74.00, 40.71), "New York"      , pm));
+////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -77.04, 38.85), "Washington, DC", pm));
+////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS,-118.40, 33.93), "Los Angeles"   , pm));
+////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -71.03, 42.37), "Boston"        , pm));
+////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS,-157.93, 21.35), "Honolulu"      , pm));
+////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, 139.75, 35.68), "Tokyo"         , pm));
+////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -90.25, 29.98), "New Orleans"   , pm));
+////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -80.28, 25.82), "Miami"         , pm));
+////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS,-117.17, 32.72), "San Diego"     , pm));
+
+////        // test with an LOD:
+////        osg::LOD* lod = new osg::LOD();
+////        lod->addChild( new PlaceNode(GeoPoint(geoSRS, 14.68, 50.0), "Prague", pm), 0.0, 2e6);
+////        labelGroup->addChild( lod );
+
+////        // absolute altitude:
+////        labelGroup->addChild( new PlaceNode(GeoPoint(geoSRS, -87.65, 41.90, 1000, ALTMODE_ABSOLUTE), "Chicago", pm));
+////    }
+
+////    //--------------------------------------------------------------------
+
+////    // a box that follows lines of latitude (rhumb line interpolation, the default)
+////    // and flashes on and off using a cull callback.
+////    {
+////        struct C : public osg::NodeCallback {
+////            void operator()(osg::Node* n, osg::NodeVisitor* nv) {
+////                static int i=0;
+////                i++;
+////                if (i % 100 < 50)
+////                    traverse(n, nv);
+////            }
+////        };
+////        Geometry* geom = new Polygon();
+////        geom->push_back( osg::Vec3d(0,   40, 0) );
+////        geom->push_back( osg::Vec3d(-60, 40, 0) );
+////        geom->push_back( osg::Vec3d(-60, 60, 0) );
+////        geom->push_back( osg::Vec3d(0,   60, 0) );
+
+////        Feature* feature = new Feature(geom, geoSRS);
+////        feature->geoInterp() = GEOINTERP_RHUMB_LINE;
+
+////        Style geomStyle;
+////        geomStyle.getOrCreate<LineSymbol>()->stroke()->color() = Color::Cyan;
+////        geomStyle.getOrCreate<LineSymbol>()->stroke()->width() = 5.0f;
+////        geomStyle.getOrCreate<LineSymbol>()->tessellationSize() = 75000;
+////        geomStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
+////        geomStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_GPU;
+
+////        FeatureNode* fnode = new FeatureNode(feature, geomStyle);
+
+////        fnode->addCullCallback(new C());
+
+////        annoGroup->addChild( fnode );
+
+////        LabelNode* label = new LabelNode("Rhumb line polygon", labelStyle);
+////        label->setPosition(GeoPoint(geoSRS, -30, 50));
+////        labelGroup->addChild(label);
+////    }
+
+////    //--------------------------------------------------------------------
+
+////    // another rhumb box that crosses the antimeridian
+////    {
+////        Geometry* geom = new Polygon();
+////        geom->push_back( -160., -30. );
+////        geom->push_back(  150., -20. );
+////        geom->push_back(  160., -45. );
+////        geom->push_back( -150., -40. );
+////        Style geomStyle;
+
+////        Feature* feature = new Feature(geom, geoSRS);
+////        feature->geoInterp() = GEOINTERP_RHUMB_LINE;
+
+////        geomStyle.getOrCreate<LineSymbol>()->stroke()->color() = Color::Lime;
+////        geomStyle.getOrCreate<LineSymbol>()->stroke()->width() = 3.0f;
+////        geomStyle.getOrCreate<LineSymbol>()->tessellationSize() = 75000;
+////        geomStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
+////        geomStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_GPU;
+
+////        FeatureNode* gnode = new FeatureNode(feature, geomStyle);
+////        annoGroup->addChild( gnode );
+
+////        LabelNode* label = new LabelNode("Antimeridian polygon", labelStyle);
+////        label->setPosition(GeoPoint(geoSRS, -175, -35));
+////        labelGroup->addChild(label);
+////    }
+
+////    //--------------------------------------------------------------------
+
+
+
+////    // A path using great-circle interpolation.
+////    // Keep a pointer to it so we can modify it later on.
+////    FeatureNode* pathNode = 0;
+////    {
+////        Geometry* path = new LineString();
+////        path->push_back( osg::Vec3d(-74, 40.714, 0) );   // New York
+////        path->push_back( osg::Vec3d(139.75, 35.68, 0) ); // Tokyo
+
+////        Feature* pathFeature = new Feature(path, geoSRS);
+////        pathFeature->geoInterp() = GEOINTERP_GREAT_CIRCLE;
+
+////        Style pathStyle;
+////        pathStyle.getOrCreate<LineSymbol>()->stroke()->color() = Color::White;
+////        pathStyle.getOrCreate<LineSymbol>()->stroke()->width() = 1.0f;
+////        pathStyle.getOrCreate<LineSymbol>()->stroke()->smooth() = true;
+////        pathStyle.getOrCreate<LineSymbol>()->tessellationSize() = 75000;
+////        pathStyle.getOrCreate<PointSymbol>()->size() = 8;
+////        pathStyle.getOrCreate<PointSymbol>()->fill()->color() = Color::Red;
+////        pathStyle.getOrCreate<PointSymbol>()->smooth() = true;
+////        pathStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
+////        pathStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_GPU;
+////        pathStyle.getOrCreate<RenderSymbol>()->depthOffset()->enabled() = true;
+
+////        //OE_INFO << "Path extent = " << pathFeature->getExtent().toString() << std::endl;
+
+////        pathNode = new FeatureNode(pathFeature, pathStyle);
+////        annoGroup->addChild( pathNode );
+
+////        LabelNode* label = new LabelNode("Great circle path", labelStyle);
+////        label->setPosition(GeoPoint(geoSRS,-170, 61.2));
+////        labelGroup->addChild(label);
+////    }
+
+////    //--------------------------------------------------------------------
+
+////    // Two circle segments around New Orleans.
+////    {
+////        Style circleStyle;
+////        circleStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Cyan, 0.5);
+////        circleStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
+////        circleStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_DRAPE;
+
+////        CircleNode* circle = new CircleNode();
+////        circle->set(
+////            GeoPoint(geoSRS, -90.25, 29.98, 1000., ALTMODE_RELATIVE),
+////            Distance(300, Units::KILOMETERS),
+////            circleStyle,
+////            Angle(-45.0, Units::DEGREES),
+////            Angle(45.0, Units::DEGREES),
+////            true);
+
+////        annoGroup->addChild( circle );
+
+////        editGroup->addChild( new CircleNodeEditor(circle) );
+////    }
+
+////    {
+////        Style circleStyle;
+////        circleStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Red, 0.5);
+////        circleStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
+////        circleStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_DRAPE;
+
+////        CircleNode* circle = new CircleNode();
+////        circle->set(
+////            GeoPoint(geoSRS, -90.25, 29.98, 1000., ALTMODE_RELATIVE),
+////            Distance(300, Units::KILOMETERS),
+////            circleStyle,
+////            Angle(45.0, Units::DEGREES),
+////            Angle(360.0 - 45.0, Units::DEGREES),
+////            true);
+
+////        annoGroup->addChild( circle );
+
+////        editGroup->addChild( new CircleNodeEditor(circle) );
+////    }
+
+////    //--------------------------------------------------------------------
+
+////    // An extruded ellipse around Miami.
+////    {
+////        Style ellipseStyle;
+////        ellipseStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Orange, 0.75);
+////        ellipseStyle.getOrCreate<ExtrusionSymbol>()->height() = 250000.0; // meters MSL
+////        EllipseNode* ellipse = new EllipseNode();
+////        ellipse->set(
+////            GeoPoint(geoSRS, -80.28, 25.82, 0.0, ALTMODE_RELATIVE),
+////            Distance(250, Units::MILES),
+////            Distance(100, Units::MILES),
+////            Angle   (0, Units::DEGREES),
+////            ellipseStyle,
+////            Angle(45.0, Units::DEGREES),
+////            Angle(360.0 - 45.0, Units::DEGREES),
+////            true);
+////        annoGroup->addChild( ellipse );
+
+////        editGroup->addChild( new EllipseNodeEditor(ellipse) );
+////    }
+////    {
+////        Style ellipseStyle;
+////        ellipseStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Blue, 0.75);
+////        ellipseStyle.getOrCreate<ExtrusionSymbol>()->height() = 250000.0; // meters MSL
+////        EllipseNode* ellipse = new EllipseNode();
+////        ellipse->set(
+////            GeoPoint(geoSRS, -80.28, 25.82, 0.0, ALTMODE_RELATIVE),
+////            Distance(250, Units::MILES),
+////            Distance(100, Units::MILES),
+////            Angle   (0, Units::DEGREES),
+////            ellipseStyle,
+////            Angle(-40.0, Units::DEGREES),
+////            Angle(40.0, Units::DEGREES),
+////            true);
+////        annoGroup->addChild( ellipse );
+
+////        editGroup->addChild( new EllipseNodeEditor(ellipse) );
+////    }
+
+////    //--------------------------------------------------------------------
+
+////    {
+////        // A rectangle around San Diego
+////        Style rectStyle;
+////        rectStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::Green, 0.5);
+////        rectStyle.getOrCreate<AltitudeSymbol>()->clamping() = AltitudeSymbol::CLAMP_TO_TERRAIN;
+////        rectStyle.getOrCreate<AltitudeSymbol>()->technique() = AltitudeSymbol::TECHNIQUE_DRAPE;
+////        RectangleNode* rect = new RectangleNode(
+////            GeoPoint(geoSRS, -117.172, 32.721),
+////            Distance(300, Units::KILOMETERS ),
+////            Distance(600, Units::KILOMETERS ),
+////            rectStyle);
+////        annoGroup->addChild( rect );
+
+////        editGroup->addChild( new RectangleNodeEditor(rect) );
+////    }
+
+////    //--------------------------------------------------------------------
+
+////    // An extruded polygon roughly the shape of Utah. Here we demonstrate the
+////    // FeatureNode, where you create a geographic geometry and use it as an
+////    // annotation.
+////    {
+////        Geometry* utah = new Polygon();
+////        utah->push_back( -114.052, 37.0   );
+////        utah->push_back( -109.054, 37.0   );
+////        utah->push_back( -109.054, 41.0   );
+////        utah->push_back( -111.040, 41.0   );
+////        utah->push_back( -111.080, 42.059 );
+////        utah->push_back( -114.080, 42.024 );
+
+////        Style utahStyle;
+////        utahStyle.getOrCreate<ExtrusionSymbol>()->height() = 250000.0; // meters MSL
+////        utahStyle.getOrCreate<PolygonSymbol>()->fill()->color() = Color(Color::White, 0.8);
+
+////        Feature*     utahFeature = new Feature(utah, geoSRS);
+////        FeatureNode* featureNode = new FeatureNode(utahFeature, utahStyle);
+
+////        annoGroup->addChild( featureNode );
+////    }
+
+////    //--------------------------------------------------------------------
+
+////    // an image overlay.
+////    {
+////        ImageOverlay* imageOverlay = 0L;
+////        osg::ref_ptr<osg::Image> image = osgDB::readRefImageFile( "../data/USFLAG.TGA" );
+////        if (image.valid())
+////        {
+////            imageOverlay = new ImageOverlay(mapNode, image.get());
+////            imageOverlay->setBounds( Bounds( -100.0, 35.0, -90.0, 40.0) );
+////            annoGroup->addChild( imageOverlay );
+
+////            editGroup->addChild( new ImageOverlayEditor(imageOverlay) );
+////        }
+////    }
+
+////    //--------------------------------------------------------------------
+
+////    // a model node with auto scaling.
+////    {
+////        Style style;
+////        style.getOrCreate<ModelSymbol>()->autoScale() = true;
+////        style.getOrCreate<ModelSymbol>()->url()->setLiteral("../data/red_flag.osg.50.scale");
+////        ModelNode* modelNode = new ModelNode(mapNode, style);
+////        modelNode->setPosition(GeoPoint(geoSRS, -100, 52));
+////        annoGroup->addChild(modelNode);
+////    }
+
+////    //--------------------------------------------------------------------
+
+////    // initialize the viewer:
+////    viewer.setSceneData( root );
+////    viewer.getCamera()->setSmallFeatureCullingPixelSize(-1.0f);
+////    return viewer.run();
+////}
